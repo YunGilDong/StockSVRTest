@@ -1,0 +1,39 @@
+cd /home/ygd/test/work/GD/CLSlib/src/GenLib
+make clean
+make
+
+cd /home/ygd/test/work/GD/CLSlib/src/lib
+make clean
+make
+
+cd /home/ygd/test/work/GD/CLSlib/src/PROCPP
+make clean
+make
+
+cd /home/ygd/test/work/GD/CLSlib/src/CLSMAIN
+make clean
+make
+
+cd /home/ygd/test/work/GD/CLSlib/src/PRC_TEST01
+make clean
+make
+
+cd /home/ygd/test/work/GD/CLSlib/src/PRC_THR
+make clean
+make
+
+cd /home/ygd/test/work/GD/CLSlib/src/PRC_THRC
+make clean
+make
+
+cd /home/ygd/test/work/GD/CLSlib/src/PRC_MTHR
+make clean
+make
+
+cd /home/ygd/test/work/GD/CLSlib/src/CPVIMS
+make clean
+make
+
+cd /home/ygd/test/work/GD/CLSlib/src/CLI
+make clean
+make
