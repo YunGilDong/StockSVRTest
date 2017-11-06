@@ -98,28 +98,6 @@ void CmdDebug(void)
 	ptr->RequestLevel(level);
 }
 //------------------------------------------------------------------------------
-// CmdPrcthrc
-//------------------------------------------------------------------------------
-void CmdPrcthrc(void)
-{
-	int end = ShmSys->PrcThrC, start = 1;
-	CLSprcthrc *pTHRC;
-	THRC_MNG *pMng;
-
-	if (!CheckEOT(EOT_DONTCARE))
-		return;
-
-	pTHRC = &ShmPtr->prcthrc[start-1];
-	PrnLine("[prcthrc]", '-', true);
-	printf("%-6s  ACT  THREAD %-15s\n", "ID", "ADDRESS");
-	for (int idx = start; idx <= end; idx++, pTHRC++)
-	{
-		pMng = &pTHRC->Mng;
-		printf("%-6d  %-3s  %-6s %-15s\n", pTHRC->ID, pTHRC->Active ? "Yes":"No", "...", pMng->address);
-	}
-	PrnLine("", '=', false);
-}
-//------------------------------------------------------------------------------
 // CmdKill
 //------------------------------------------------------------------------------
 void CmdKill(void)

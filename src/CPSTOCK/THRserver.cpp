@@ -50,6 +50,9 @@ bool TSVcreateClient(char *remoteIP)
 	char name[SHORTBUF_LEN];
 	CLSstockCL *cPtr, *dPtr;
 
+	// Client 접속시점에 remoteIP Map 등록
+	// Map에 remoteIP등록 및 thread생성 및 실행
+
 	Log.Debug("createClient IP:[%s]", remoteIP);
 	// 등록된 Equip 인지 확인
 	if ((dPtr = Map.GetDB(remoteIP)) == NULL)
@@ -268,5 +271,6 @@ void *THRserver(void *data)
 		ThrServer.UpdateRunInfo();	// 실행 정보 갱신
 		ThrServer.Pause(5);		// 500 msec
 	}
+	Log.Write("THRserver close");
 	//TCLclearEnv();		// 작업 환경 정리
 }

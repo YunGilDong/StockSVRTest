@@ -1,0 +1,14 @@
+cd /home/ygd/test/work/GD/StockSvr/src/GenLib
+make clean
+
+cd /home/ygd/test/work/GD/StockSvr/src/lib
+make clean
+
+cd /home/ygd/test/work/GD/StockSvr/src/STOCKMAIN
+make clean
+
+cd /home/ygd/test/work/GD/StockSvr/src/CPSTOCK
+make clean
+
+cd /home/ygd/test/work/GD/StockSvr/src/CLI
+make clean

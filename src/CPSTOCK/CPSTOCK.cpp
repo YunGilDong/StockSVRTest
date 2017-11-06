@@ -15,7 +15,7 @@ void ClearEnv(void);
 //------------------------------------------------------------------------------
 // Global Variable
 //------------------------------------------------------------------------------
-CLSlog Log("CPVIMS", DIR_LOG);
+CLSlog Log("CPSTOCK", DIR_LOG);
 CLSmap Map("CLMAP"); 
 //------------------------------------------------------------------------------
 // Local Variable
@@ -373,7 +373,7 @@ int main(int argc, char **argv)
 	Log.Write("Main start");
 	MainThrId = pthread_self();
 	Log.Write("Main Thread ID[%d]", MainThrId);
-	Log.Write("CPVIMS main log address %d ", Log);
+	Log.Write("CPSTOCK main log address %d ", Log);
 
 	//Main Loop
 	while (initOK && !NeedTerminate())

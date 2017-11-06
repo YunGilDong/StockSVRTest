@@ -1,14 +1,14 @@
 #
 # Makefile
 #
-# Target: CLI
+# Target: SCLI
 #
 # Environment
 #
-WORK_INC =  $(WORK_HOME)/inc/
-WORK_INC2 = $(WORK_HOME)/src/PRC_THR/
-WORK_LIB =  $(WORK_HOME)/lib/
-WORK_BIN =  $(WORK_HOME)/bin/
+WORK_INC =  $(WORK_HOME_STOCK)/inc/
+WORK_INC2 = $(WORK_HOME_STOCK)/src/PRC_THR/
+WORK_LIB =  $(WORK_HOME_STOCK)/lib/
+WORK_BIN =  $(WORK_HOME_STOCK)/bin/
 #
 
 
@@ -35,7 +35,7 @@ LINK = g++ $(LDOPTS)
 # Libraries used for linking
 #
 #LIBS = -lpthread -lSane
-LIBS = -lpthread -lSane -lYgd
+LIBS = -lpthread -lSane -lStockCL
 #
 #
 # Object files
@@ -44,7 +44,7 @@ OBJS = CLI.o CLScommand.o CLIfunction.o
 #
 # Target Process
 #
-TARGET = CLI
+TARGET = SCLI
 #
 # Make the Executalbe Program
 #

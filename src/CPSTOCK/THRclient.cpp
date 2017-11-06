@@ -38,7 +38,7 @@ bool TCLinitNetwork(CLSstockCL *info)
 	CLSthreadC *ptr = info->Thread;
 
 	// Create TCP
-	sprintf(name, "VIMSTCP%d", info->ID);
+	sprintf(name, "STOCKCL%d", info->ID);
 	if ((info->TcpIF = new CLSstockIF(name, 0, info->Socket, TCP_CHILD)) == NULL)
 	{
 		Log.Write("CLient TCP create fail");

@@ -23,7 +23,6 @@ CLScommand CmdTable[MAX_CLICMD] = {
 	CLScommand("help", (FUNCPTR)CmdHelp, "help [<명령>]", "명령 도움말 출력"),
 	CLScommand("process", (FUNCPTR)CmdProcess, "process", "프로세스 운영상황 출력"),
 	CLScommand("debug", (FUNCPTR)CmdDebug, "debug <프로세스> <레벨:0-9>", "프로세스 디버깅 레벨을 변경"),
-	CLScommand("prcthrc", (FUNCPTR)CmdPrcthrc, "PRCTHRC", "PRC_THRC상태"),
 	CLScommand("kill", (FUNCPTR)CmdKill, "kill <프로세스>", "프로세스 종료"),
 	CLScommand("exit", (FUNCPTR)CmdExit, "exit", "CLI 종료"),
 	CLScommand("terminate", (FUNCPTR)CmdTerminate, "terminate", "CLS system 종료")
