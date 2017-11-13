@@ -271,6 +271,7 @@ bool InitStockCL(void)
 		Map.AddDB(pStockCL->Mng.address, pStockCL);
 	}
 	int i = 0;
+	// È®ÀÎ¿ë.
 	for (it = Map.m_dbase.begin(); it != Map.m_dbase.end(); it++)
 	{		
 		//if ((ptr = it->second) == NULL)

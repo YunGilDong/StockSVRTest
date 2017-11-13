@@ -38,11 +38,11 @@ bool LoadDatabase(void)
 {
 	Log.Write("LoadDatabase..");
 	// Initialize Stock client database
-	if (!LoadStockCL())
+	/*if (!LoadStockCL())
 	{
 		Log.Write("StockCL database initailization fail");
 		return (false);
 	}
-
+*/
 	return (true);	
 }

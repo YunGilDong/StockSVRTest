@@ -14,19 +14,9 @@
 //------------------------------------------------------------------------------
 typedef struct
 {
-	int id;	// Ispt Equip Id;
-	BYTE type;	// Ispt equip Type
+	int id;	// conn seq
 	char address[IPADDR_LEN];
 } STOCKCL_MNG;
-//------------------------------------------------------------------------------
-// EQUIP_OPR
-//------------------------------------------------------------------------------
-typedef struct
-{
-	bool stsCom;
-} STOCKCL_OPR;
-
-#define EQUIP_OPR_SIZE		sizeof(EQUIP_OPR);
 //------------------------------------------------------------------------------
 // Class
 //------------------------------------------------------------------------------
@@ -39,7 +29,6 @@ public:
 	int Socket;
 	bool Active;
 	STOCKCL_MNG Mng;
-	STOCKCL_OPR Opr;
 	CLStcp *TcpIF;
 	CLSthreadC *Thread;
 
