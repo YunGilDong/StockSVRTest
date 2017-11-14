@@ -9,6 +9,7 @@ extern CLSlog Log;
 extern CLSmap Map;
 extern SHARED_MEM *ShmPtr;
 extern CLSthreadC ThrServer;
+extern queue<int> PoolIndexQ;
 
 extern void DeleteClient(CLSstockCL *ptr, char *address);
 extern void *THRclient(void *);
@@ -22,10 +23,9 @@ void TSVclearEnv(void);
 // Global Variable
 //------------------------------------------------------------------------------
 // Local Variable
-CLStcp TcpServer("VIMSTCP", TCP_SERVER_PORT, "");
+CLStcp TcpServer("StockCL", TCP_SERVER_PORT, "");
 //------------------------------------------------------------------------------
-// CLStcp TcpServer("EQUIPSVTCP","TCP_SERVER_PORT, "")'
-
+// CLStcp TcpServer("EQUIPSVTCP","TCP_SERVER_PORT, "");
 //------------------------------------------------------------------------------
 // TSVsigHandler
 //------------------------------------------------------------------------------
@@ -57,8 +57,8 @@ bool TSVcreateClient(char *remoteIP)
 	// 등록된 Equip 인지 확인
 	if ((dPtr = Map.GetDB(remoteIP)) == NULL)
 	{
-		Log.Write(1, "Undefined Equip ID access [%s]", remoteIP);
-		close(TcpServer.NewSocket);
+		// Ip Init();
+		// AddDB(ip, pStockLC)
 		return (false);
 	}
 	// 존재하는 Client확인
@@ -97,6 +97,28 @@ bool TSVcreateClient(char *remoteIP)
 	Log.Write("New client start [%s]", name);
 	dPtr->Active = true;
 	return (true);
+}
+//------------------------------------------------------------------------------
+// GetPoolIndex
+//------------------------------------------------------------------------------
+int GetPoolIndex()
+{
+	int poolIdx = 0;
+		
+	Log.Debug("thr q size  : %d", PoolIndexQ.size());
+	Log.Debug("thr q empty : %d", PoolIndexQ.empty());
+	Log.Debug("thr q front : %d", PoolIndexQ.front());
+
+	if (!PoolIndexQ.empty())
+	{
+		Log.Debug("thr Q OK");
+		poolIdx = PoolIndexQ.front();
+		PoolIndexQ.pop();
+	}
+	else 
+		return -1;
+
+	return poolIdx;
 }
 //------------------------------------------------------------------------------
 // TSVmanage
@@ -253,9 +275,11 @@ void *THRserver(void *data)
 	initOK = TSVinitEnv();	// 작업 환경 초기화
 
 	pthread_t id = pthread_self();
-	Log.Write("Server Thread ID[%d] init:[%d]", id, initOK);
+	Log.Debug("Server Thread ID[%d] init:[%d]", id, initOK);
 
-	Log.Write("THRserver log address %d ", Log);
+	Log.Debug("THRserver log address %d ", Log);
+	//Log.Write("THR Pool IDX : %d", GetPoolIndex());
+	Log.Debug("THR Pool IDX : %d", GetPoolIndex());
 
 	// Main loop
 	while (initOK && !ThrServer.Terminate && !NeedTerminate())
@@ -272,5 +296,6 @@ void *THRserver(void *data)
 		ThrServer.Pause(5);		// 500 msec
 	}
 	Log.Write("THRserver close");
+	Log.Debug("THRserver close");
 	//TCLclearEnv();		// 작업 환경 정리
 }

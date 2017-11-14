@@ -17,6 +17,7 @@ void ClearEnv(void);
 //------------------------------------------------------------------------------
 CLSlog Log("CPSTOCK", DIR_LOG);
 CLSmap Map("CLMAP"); 
+queue<int> PoolIndexQ;
 //------------------------------------------------------------------------------
 // Local Variable
 //------------------------------------------------------------------------------
@@ -369,12 +370,19 @@ int main(int argc, char **argv)
 {
 	bool initOK;
 
+	PoolIndexQ.push(1);
+
 	// 작업 환경 초기화
 	initOK = InitEnv(argc, argv);
 	Log.Write("Main start");
 	MainThrId = pthread_self();
 	Log.Write("Main Thread ID[%d]", MainThrId);
 	Log.Write("CPSTOCK main log address %d ", Log);
+	Log.Debug("CPSTOCK main log address %d ", Log);	
+
+	Log.Debug("q size  : %d", PoolIndexQ.size());
+	Log.Debug("q empty : %d", PoolIndexQ.empty());
+	Log.Debug("q front : %d", PoolIndexQ.front());
 
 	//Main Loop
 	while (initOK && !NeedTerminate())
