@@ -135,6 +135,8 @@ bool CLSstockIF::ManageTX(void)
 		return (true);
 
 
+
+
 	return (true);
 }
 //------------------------------------------------------------------------------
@@ -204,6 +206,7 @@ bool CLSstockIF::Manage(void)
 	if (!ManageRX())
 	{
 		Log.Write("%s RX fail[%d]", m_stamp, m_id);
+		Log.Debug("%s RX fail[%d]", m_stamp, m_id);
 		Close();
 		return (false);
 	}
@@ -211,6 +214,7 @@ bool CLSstockIF::Manage(void)
 	if (!ManageTX())
 	{
 		Log.Write("%s TX fail[%d]", m_stamp, m_id);
+		Log.Debug("%s TX fail[%d]", m_stamp, m_id);
 		Close();
 		return (false);
 	}

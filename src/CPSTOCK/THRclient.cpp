@@ -141,11 +141,12 @@ void *THRclient(void *data)
 			if (cycle == 100000000) cycle = 0;
 		}
 		// Client 통신 관리
-		/*if (!info->TcpIF->Manage())
+		if (!info->TcpIF->Manage())
 		{		
 			Log.Write("##CLTHR TCP Mng false");
+			Log.Debug("############ CLTHR TCP Mng false @@@@@@@@@@@@@@@@@@");
 			break;
-		}*/
+		}
 
 		pThread->UpdateRunInfo();	// 실행 정보 갱신
 		pThread->Pause(5);		// 500 msec

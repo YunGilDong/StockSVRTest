@@ -19,11 +19,14 @@ extern bool NeedTerminate(void);
 // Prototype
 //------------------------------------------------------------------------------
 void TSVclearEnv(void);
+void InitClientIp(char *remoteIp);
+int GetPoolIndex();
 //------------------------------------------------------------------------------
 // Global Variable
 //------------------------------------------------------------------------------
 // Local Variable
 CLStcp TcpServer("StockCL", TCP_SERVER_PORT, "");
+int AcceptSeq = 0;
 //------------------------------------------------------------------------------
 // CLStcp TcpServer("EQUIPSVTCP","TCP_SERVER_PORT, "");
 //------------------------------------------------------------------------------
@@ -57,9 +60,14 @@ bool TSVcreateClient(char *remoteIP)
 	// 등록된 Equip 인지 확인
 	if ((dPtr = Map.GetDB(remoteIP)) == NULL)
 	{
-		// Ip Init();
-		// AddDB(ip, pStockLC)
-		return (false);
+		InitClientIp(remoteIP);	// Ip Init and AddDB
+		
+		// 초기화 후 Map이 없을경우(비정상 상황)
+		if ((dPtr = Map.GetDB(remoteIP)) == NULL)
+		{
+			close(TcpServer.NewSocket);
+			return (false);
+		}
 	}
 	// 존재하는 Client확인
 	sprintf(name, "CLTHR%d", dPtr->ID);
@@ -99,6 +107,31 @@ bool TSVcreateClient(char *remoteIP)
 	return (true);
 }
 //------------------------------------------------------------------------------
+// InitClientIp
+//------------------------------------------------------------------------------
+void InitClientIp(char *remoteIp)
+{
+	int poolIdx = GetPoolIndex();
+	DB_STOCKCL info;
+	CLSstockCL *pStockCL = &ShmPtr->stockCL[poolIdx];
+
+	sprintf(info.address, remoteIp);
+	info.id = poolIdx;
+	Log.Debug(1, "\t[AddClientDB]  [%d][%d]:[%s]", poolIdx, info.id, info.address);
+	Log.Write(1, "\t[AddClientDB]  [%d][%d]:[%s]", poolIdx, info.id, info.address);
+	pStockCL->Init(&info);
+
+	// AddDB
+	Map.AddDB(pStockCL->Mng.address, pStockCL);
+}
+//------------------------------------------------------------------------------
+// AddClientDB
+//------------------------------------------------------------------------------
+void AddClientDB(char *remoteIp)
+{
+	
+}
+//------------------------------------------------------------------------------
 // GetPoolIndex
 //------------------------------------------------------------------------------
 int GetPoolIndex()
@@ -116,7 +149,7 @@ int GetPoolIndex()
 		PoolIndexQ.pop();
 	}
 	else 
-		return -1;
+		return AcceptSeq;
 
 	return poolIdx;
 }
@@ -139,6 +172,7 @@ bool TSVmanage(void)
 	if (!TSVcreateClient(remoteIP))
 		return (true);
 
+	AcceptSeq++;
 	return (true);
 }
 //------------------------------------------------------------------------------
@@ -157,7 +191,7 @@ bool TSVmanageTest(void)
 	{
 		if (TSVcreateClient(id1))
 		{
-			
+			AcceptSeq++;			
 			return (true);
 		}
 	}/*
@@ -278,19 +312,21 @@ void *THRserver(void *data)
 	Log.Debug("Server Thread ID[%d] init:[%d]", id, initOK);
 
 	Log.Debug("THRserver log address %d ", Log);
-	//Log.Write("THR Pool IDX : %d", GetPoolIndex());
-	Log.Debug("THR Pool IDX : %d", GetPoolIndex());
 
 	// Main loop
 	while (initOK && !ThrServer.Terminate && !NeedTerminate())
 	{
-		//Log.Debug("VIMS server run [%d]##", cycle++); 
+		if (((++cycle) % 500) == 0)
+		{
+			Log.Debug("STOCK Trade server run [%d]##", cycle);
+			if (cycle == 100000000) cycle = 0;
+		}
 		ThrServer.MarkTime();
 
-		if (!TSVmanageTest())
+		/*if (!TSVmanageTest())
+			break;*/
+		if (!TSVmanage())
 			break;
-		//if (!TSVmanage())
-		//		break;
 
 		ThrServer.UpdateRunInfo();	// 실행 정보 갱신
 		ThrServer.Pause(5);		// 500 msec

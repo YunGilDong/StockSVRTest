@@ -8,6 +8,8 @@
 extern void *THRserver(void *);
 extern void TSVsigHandler(int);
 extern void TCLsigHandler(CLSstockCL *, int);
+
+extern queue<int> PoolIndexQ;
 //------------------------------------------------------------------------------
 // Prototype
 //------------------------------------------------------------------------------
@@ -17,7 +19,6 @@ void ClearEnv(void);
 //------------------------------------------------------------------------------
 CLSlog Log("CPSTOCK", DIR_LOG);
 CLSmap Map("CLMAP"); 
-queue<int> PoolIndexQ;
 //------------------------------------------------------------------------------
 // Local Variable
 //------------------------------------------------------------------------------
@@ -345,7 +346,7 @@ bool InitEnv(int argc, char **argv)
 	}
 	Log.Write("Init Thread");
 	
-	InitStockCL();		// Stock client 정보 초기화
+	///InitStockCL();		// Stock client 정보 초기화
 	InitDebug();		// Initialize debugging information	
 	ShmPrc->Register(getpid());	// Register process
 	gettimeofday(&TMtimer, NULL);
