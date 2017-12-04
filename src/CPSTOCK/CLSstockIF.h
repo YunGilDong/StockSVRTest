@@ -14,6 +14,7 @@
 //------------------------------------------------------------------------------
 #define	TCPBUF_LEN			1024
 #define	STOCK_SHORTBUF_LEN	256
+#define TEST__INTERVAL		3000	// 3sec
 //------------------------------------------------------------------------------
 // Protocol
 //------------------------------------------------------------------------------
@@ -27,10 +28,30 @@
 #define STOCK_DATA		STOCK_SEQ+1
 //------------------------------------------------------------------------------
 #define STOCKDEAL_PORT	12000
+//---------------------------------------------------------------------------
+// Protocol
+//---------------------------------------------------------------------------
+#define STX1_CHAR 0x7E
+#define STX2_CHAR 0x7E
+//---------------------------------------------------------------------------
+#define STX1    0
+#define STX2    STX1+1
+#define SIZE1   STX2+1
+#define SIZE2   SIZE1+1
+#define STATUS  SIZE2+1
+#define OPCODE  STATUS+1
+#define SEQ     OPCODE+1
+#define DATA    SEQ+1
+//---------------------------------------------------------------------------
+#define HEARTBEAT   0x01
+#define BUY_SIG     0x20
+#define SELL_SIG    0x21
+#define ACK         0x80
+#define NACK        0x81
 //------------------------------------------------------------------------------
 // Type definition
 //------------------------------------------------------------------------------
-typedef enum { STX1, STX2, SIZE1, SIZE2, STATUS, OPCODE, SEQ, DATA, LRC} RX_STATE;
+typedef enum { COMST_STX1, COMST_STX2, COMST_SIZE1, COMST_SIZE2, COMST_DATA } RX_STATE;
 //------------------------------------------------------------------------------
 // TOM_INFO (송신 메시지에 대해 수신을 확인할 때)
 //------------------------------------------------------------------------------
@@ -62,6 +83,7 @@ private:
 	CLSstockCL *m_pStockCL;
 	time_t m_curClock;
 	struct tm *m_curTod;
+	struct timeval m_testTimer;	// test
 
 	void InitComState(bool connected = false);
 	CON_RESULT ManageConnection(void);
@@ -73,6 +95,8 @@ private:
 	void SetRxState(RX_STATE state, int delta = 0);
 	bool SendAck(BYTE code, BYTE nackCode = 0);
 	bool SendNAck(BYTE code);
+	bool SendSignal(BYTE code);
+	bool SendTest(BYTE code);
 
 	bool SendMessage(void);
 	bool SendMessage(BYTE code, int length = 0, char *info = NULL);

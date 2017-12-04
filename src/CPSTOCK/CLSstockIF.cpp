@@ -134,8 +134,9 @@ bool CLSstockIF::ManageTX(void)
 	if (ptr->waiting)
 		return (true);
 
-
-
+	// Test Sendmessage (SendTest)	 interval 3 sec
+	if (CheckElapsedTime(&m_testTimer, TEST__INTERVAL))
+		return(SendTest(0x99));
 
 	return (true);
 }
@@ -165,11 +166,30 @@ bool CLSstockIF::SendMessage(void)
 bool CLSstockIF::SendMessage(BYTE code, int length, char *info)
 {
 	int txLength = length;
-	char message[TCPBUF_LEN], stamp[SHORTBUF_LEN];
+	char message[TCPBUF_LEN], stamp[SHORTBUF_LEN];	
+
+	switch (code)
+	{
+	case HEARTBEAT:
+		break;
+	case BUY_SIG:
+		break;
+	case SELL_SIG:
+		break;
+	case ACK:
+		break;
+	case NACK:
+		break;
+	default:
+		memcpy(message, info, length);
+		break;
+	}
 
 	if (!Write(message, txLength))
 		return (false);
-	
+
+	Log.FLdump(1, "SEND[RAW]", message, length, length);
+
 	return (true);
 }
 //------------------------------------------------------------------------------
@@ -189,6 +209,30 @@ bool CLSstockIF::SendNAck(BYTE code)
 	int idx;
 	char info[SHORTBUF_LEN];
 	return (SendMessage(0, idx, info));
+}
+bool CLSstockIF::SendSignal(BYTE code)
+{
+	int idx;
+	char info[SHORTBUF_LEN];
+	
+	return (SendMessage(0x99, idx, info));
+}
+bool CLSstockIF::SendTest(BYTE code)
+{
+	int idx = 0;
+	char info[SHORTBUF_LEN];
+	memset(info, 0x00, 5);
+	sprintf(info, "hi, this is test message");
+	idx = strlen(info);
+	//Log.Debug("test:[%d]:[%s]", idx, info);
+
+	/*info[0] = 0x01;		idx += 1;
+	info[1] = 0x02;		idx += 1;
+	info[2] = 0x03;		idx += 1;
+	info[3] = 0x04;		idx += 1;
+	info[4] = 0x05;		idx += 1;*/
+
+	return (SendMessage(code, idx, info));
 }
 //------------------------------------------------------------------------------
 // Manage
