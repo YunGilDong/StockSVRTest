@@ -13,8 +13,10 @@
 // Constant
 //------------------------------------------------------------------------------
 #define	TCPBUF_LEN			1024
+#define STOCK_HEADER_LEN			7
 #define	STOCK_SHORTBUF_LEN	256
 #define TEST__INTERVAL		3000	// 3sec
+#define TEST_SIG__INTERVAL	5000	// 5sec
 //------------------------------------------------------------------------------
 // Protocol
 //------------------------------------------------------------------------------
@@ -66,7 +68,21 @@ typedef struct
 	char message[TCPBUF_LEN];	// 송신 메시지
 	struct timeval txTime;	// 송신 시각
 } TOM_INFO;
-
+//------------------------------------------------------------------------------
+// TradeInfo SIG
+//------------------------------------------------------------------------------
+typedef struct
+{
+	char type;
+	BYTE mon;
+	BYTE day;
+	BYTE hour;
+	BYTE minute;
+	char stockCode[7];
+	char stockNm[32];
+	unsigned int price;
+	bool valid;
+} TradeSigInfo;
 #define TOM_INFO_SIZE		sizeof(TOM_INFO)
 //------------------------------------------------------------------------------
 // Class
@@ -77,6 +93,8 @@ private:
 	int m_id;	// stock client ID
 	int m_index;
 	int m_length;
+	int m_txSequence;
+	int m_rxSequence;
 	char m_stamp[SHORTBUF_LEN];
 	char m_message[TCPBUF_LEN];
 	TOM_INFO m_tomInfo;
@@ -84,6 +102,9 @@ private:
 	time_t m_curClock;
 	struct tm *m_curTod;
 	struct timeval m_testTimer;	// test
+	struct timeval m_sigTimer;	// signal 발생 타이머 (test)
+
+	TradeSigInfo m_sigInfo;
 
 	void InitComState(bool connected = false);
 	CON_RESULT ManageConnection(void);
@@ -99,9 +120,7 @@ private:
 	bool SendTest(BYTE code);
 
 	bool SendMessage(void);
-	bool SendMessage(BYTE code, int length = 0, char *info = NULL);
-
-	
+	bool SendMessage(BYTE code, int length = 0, char *info = NULL);	
 
 public:
 	CLSstockIF(void);
@@ -111,6 +130,8 @@ public:
 
 	bool Manage(void);
 	void SetID(int id, CLSstockCL *pStockCL);
+	void SetStockCode(char *info);		// test용
+	void SetStockName(char *info);		// test용
 };
 //------------------------------------------------------------------------------
 #endif // !CLSvimsIFH

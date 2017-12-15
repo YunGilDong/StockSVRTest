@@ -138,6 +138,10 @@ bool CLSstockIF::ManageTX(void)
 	if (CheckElapsedTime(&m_testTimer, TEST__INTERVAL))
 		return(SendTest(0x99));
 
+	// Test Sendmessage (SendSig)	 interval 5 sec
+	if (CheckElapsedTime(&m_sigTimer, TEST_SIG__INTERVAL))
+		return(SendSignal(BUY_SIG));
+
 	return (true);
 }
 //------------------------------------------------------------------------------
@@ -165,14 +169,25 @@ bool CLSstockIF::SendMessage(void)
 //------------------------------------------------------------------------------
 bool CLSstockIF::SendMessage(BYTE code, int length, char *info)
 {
-	int txLength = length;
+	int txLength = length + STOCK_HEADER_LEN + 1;	// +1 : LRC
 	char message[TCPBUF_LEN], stamp[SHORTBUF_LEN];	
+	BYTE lrc;
+
+	memset(message, 0, STOCK_HEADER_LEN);
+	message[STOCK_STX1] = STX1_CHAR;
+	message[STOCK_STX2] = STX1_CHAR;
+	message[STOCK_STATUS] = 0;
+	message[STOCK_OPCODE] = code;
 
 	switch (code)
 	{
 	case HEARTBEAT:
 		break;
 	case BUY_SIG:
+		message[SEQ] = ++m_txSequence;
+		if (length && info != NULL)
+			memcpy(&message[DATA], info, length);
+
 		break;
 	case SELL_SIG:
 		break;
@@ -184,11 +199,15 @@ bool CLSstockIF::SendMessage(BYTE code, int length, char *info)
 		memcpy(message, info, length);
 		break;
 	}
+	SetNumber(&message[SIZE1], length + 1, 2);
+	lrc = GenLRC((BYTE*)message, txLength - 1);
+	message[txLength - 1] = lrc;
+
 
 	if (!Write(message, txLength))
 		return (false);
 
-	Log.FLdump(1, "SEND[RAW]", message, length, length);
+	Log.FLdump(1, "SEND[RAW]", message, txLength, txLength);
 
 	return (true);
 }
@@ -212,10 +231,35 @@ bool CLSstockIF::SendNAck(BYTE code)
 }
 bool CLSstockIF::SendSignal(BYTE code)
 {
-	int idx;
-	char info[SHORTBUF_LEN];
+	int idx=0;
+	char info[STOCK_SHORTBUF_LEN];
+
+	memset(info, 0x00, 47);
+
+	info[idx] = 'b';	m_sigInfo.type = info[idx];		 idx += 1;
+	/*info[idx] = 12;		m_sigInfo.mon = info[idx];		 idx += 1;
+	info[idx] = 15;		m_sigInfo.day = info[idx];		 idx += 1;
+	info[idx] = 17;		m_sigInfo.hour = info[idx];		 idx += 1;
+	info[idx] = 16;		m_sigInfo.minute = info[idx];	 idx == 1;*/
+
+	SetNumber(&info[idx], 12151810, 4);					idx += 4;
 	
-	return (SendMessage(0x99, idx, info));
+
+	//SetStockCode(&info[idx]);	idx += 7;
+	//SetStockName(&info[idx]);	idx += 32;
+	
+	snprintf(&info[idx], 7, "%s", "123456");	
+	memcpy(m_sigInfo.stockCode, &info[idx], 7);    idx += 7;	// code		
+
+	snprintf(&info[idx], 32, "%s", "삼성전자");	
+	memcpy(m_sigInfo.stockNm, &info[idx], 7);    idx += 32;	// name
+
+	SetNumber(&info[idx], 2500, 4);	 m_sigInfo.price = 2500;		idx += 4;
+
+	Log.Debug("%c %d %d %d %d", m_sigInfo.type, m_sigInfo.mon, m_sigInfo.day, m_sigInfo.hour, m_sigInfo.minute);
+	Log.Debug("%s %s %d", m_sigInfo.stockCode, m_sigInfo.stockNm, m_sigInfo.price);
+	
+	return (SendMessage(code, idx, info));
 }
 bool CLSstockIF::SendTest(BYTE code)
 {
@@ -272,4 +316,54 @@ void CLSstockIF::SetID(int id, CLSstockCL *pStockCL)
 	m_id = id;
 	m_pStockCL = pStockCL;
 	sprintf(m_stamp, "CLTCP%04d", m_id);
+}
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void CLSstockIF::SetStockCode(char *info)		// test용
+{
+	// size 7
+	// 현재 시간값을 구해서 겹치지 않는 범위에서 random하게 생성	
+	char data[7];
+	int tmV = 0;
+	struct timeval tm;
+	gettimeofday(&tm, NULL);
+	tmV = tm.tv_sec;
+	data[0] = tmV % 10;		tmV /= 10;
+	data[1] = tmV % 10;		tmV /= 10;
+	data[2] = tmV % 10;		tmV /= 10;
+	data[3] = tmV % 10;		tmV /= 10;
+	data[4] = tmV % 10;		tmV /= 10;
+	data[5] = tmV % 10;		tmV /= 10;
+	data[6] = tmV % 10;		
+
+	memcpy(info, data, 7);
+	Log.Write("dCODE:[%s]", data);
+	Log.Write("iCODE:[%s]", info);
+}
+//------------------------------------------------------------------------------									
+//
+//------------------------------------------------------------------------------
+void CLSstockIF::SetStockName(char *info)		// test용
+{
+	// size 32
+	// 현재 시간값을 구해서 겹치지 않는 범위에서 random하게 생성
+
+	char data[32];
+	int tmV = 0;
+	struct timeval tm;
+	gettimeofday(&tm, NULL);
+	tmV = tm.tv_sec;
+	data[0] = 'N';
+	data[1] = 'M';
+	data[2] = tmV % 10;		tmV /= 10;
+	data[3] = tmV % 10;		tmV /= 10;
+	data[4] = tmV % 10;		tmV /= 10;
+	data[5] = tmV % 10;		tmV /= 10;
+	data[6] = tmV % 10;		tmV /= 10;
+	data[7] = tmV % 10;
+
+	memcpy(info, data, 32);
+	Log.Write("dNAME:[%s]", data);
+	Log.Write("iNAME:[%s]", info);
 }
