@@ -130,8 +130,8 @@ public:
 
 	bool Manage(void);
 	void SetID(int id, CLSstockCL *pStockCL);
-	void SetStockCode(char *info);		// test용
-	void SetStockName(char *info);		// test용
+	void SetStockCode(char *info, int idx);		// test용
+	void SetStockName(char *info, int idx);		// test용
 };
 //------------------------------------------------------------------------------
 #endif // !CLSvimsIFH

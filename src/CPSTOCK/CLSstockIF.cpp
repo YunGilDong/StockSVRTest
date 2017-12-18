@@ -245,14 +245,14 @@ bool CLSstockIF::SendSignal(BYTE code)
 	SetNumber(&info[idx], 12151810, 4);					idx += 4;
 	
 
-	//SetStockCode(&info[idx]);	idx += 7;
-	//SetStockName(&info[idx]);	idx += 32;
+	SetStockCode(&info[idx], 7);	idx += 7;
+	SetStockName(&info[idx], 32);	idx += 32;
 	
-	snprintf(&info[idx], 7, "%s", "123456");	
-	memcpy(m_sigInfo.stockCode, &info[idx], 7);    idx += 7;	// code		
+	//snprintf(&info[idx], 7, "%s", "123456");	
+	//memcpy(m_sigInfo.stockCode, &info[idx], 7);    idx += 7;	// code		
 
-	snprintf(&info[idx], 32, "%s", "삼성전자");	
-	memcpy(m_sigInfo.stockNm, &info[idx], 7);    idx += 32;	// name
+	//snprintf(&info[idx], 32, "%s", "삼성전자");	
+	//memcpy(m_sigInfo.stockNm, &info[idx], 7);    idx += 32;	// name
 
 	SetNumber(&info[idx], 2500, 4);	 m_sigInfo.price = 2500;		idx += 4;
 
@@ -320,50 +320,58 @@ void CLSstockIF::SetID(int id, CLSstockCL *pStockCL)
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void CLSstockIF::SetStockCode(char *info)		// test용
+void CLSstockIF::SetStockCode(char *info, int idx)		// test용
 {
 	// size 7
 	// 현재 시간값을 구해서 겹치지 않는 범위에서 random하게 생성	
-	char data[7];
+	char data[SHORTBUF_LEN];
+	char *pInfo = info;
 	int tmV = 0;
+	int val=0;
 	struct timeval tm;
 	gettimeofday(&tm, NULL);
 	tmV = tm.tv_sec;
-	data[0] = tmV % 10;		tmV /= 10;
-	data[1] = tmV % 10;		tmV /= 10;
-	data[2] = tmV % 10;		tmV /= 10;
-	data[3] = tmV % 10;		tmV /= 10;
-	data[4] = tmV % 10;		tmV /= 10;
-	data[5] = tmV % 10;		tmV /= 10;
-	data[6] = tmV % 10;		
-
-	memcpy(info, data, 7);
-	Log.Write("dCODE:[%s]", data);
-	Log.Write("iCODE:[%s]", info);
+	
+	for (int i = 0; i < idx-1; i++, pInfo++)
+	{
+		val = tmV % 10;
+		//itoa(val, pInfo, 10);	tmV /= 10;	
+		sprintf(pInfo, "%d", val);	tmV /= 10;
+		Log.Debug("CD:%d", val);
+	}
+	Log.Write("pINFO(CD):[%c:%c:%c:%c:%c:%c]", pInfo[0], pInfo[1], pInfo[2], pInfo[3]
+		, pInfo[4], pInfo[5]);
+	
+	Log.Write("pINFO(CD):[%s]", pInfo);
 }
 //------------------------------------------------------------------------------									
 //
 //------------------------------------------------------------------------------
-void CLSstockIF::SetStockName(char *info)		// test용
+void CLSstockIF::SetStockName(char *info, int idx)		// test용
 {
 	// size 32
 	// 현재 시간값을 구해서 겹치지 않는 범위에서 random하게 생성
 
 	char data[32];
+	char *pInfo = info;
 	int tmV = 0;
+	int val = 0;
 	struct timeval tm;
 	gettimeofday(&tm, NULL);
 	tmV = tm.tv_sec;
-	data[0] = 'N';
-	data[1] = 'M';
-	data[2] = tmV % 10;		tmV /= 10;
-	data[3] = tmV % 10;		tmV /= 10;
-	data[4] = tmV % 10;		tmV /= 10;
-	data[5] = tmV % 10;		tmV /= 10;
-	data[6] = tmV % 10;		tmV /= 10;
-	data[7] = tmV % 10;
 
-	memcpy(info, data, 32);
-	Log.Write("dNAME:[%s]", data);
-	Log.Write("iNAME:[%s]", info);
+	sprintf(&pInfo[0], "NM");
+
+	for (int i = 0; i < 8; i++)
+	{
+		val = tmV % 10;
+		sprintf(&pInfo[i+2], "%d", val);	tmV /= 10;
+		Log.Debug("NM:%d", val);
+	}
+
+	Log.Write("pINFO(NM):[%c:%c:%c:%c:%c:%c:%c:%c]", pInfo[2], pInfo[3], pInfo[4], pInfo[5]
+		, pInfo[6], pInfo[7], pInfo[8], pInfo[9]);
+
+	Log.Write("pINFO(NM):[%s]", pInfo);
+
 }
