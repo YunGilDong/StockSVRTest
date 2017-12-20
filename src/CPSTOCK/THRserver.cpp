@@ -316,9 +316,9 @@ void *THRserver(void *data)
 	// Main loop
 	while (initOK && !ThrServer.Terminate && !NeedTerminate())
 	{
-		if (((++cycle) % 500) == 0)
+		if (((++cycle) % 1000) == 0)
 		{
-			Log.Debug("STOCK Trade server run [%d]##", cycle);
+			Log.Debug("STOCK Trade server run [%d]##", cycle/1000);
 			if (cycle == 100000000) cycle = 0;
 		}
 		ThrServer.MarkTime();

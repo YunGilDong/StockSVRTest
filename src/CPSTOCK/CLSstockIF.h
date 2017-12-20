@@ -15,8 +15,8 @@
 #define	TCPBUF_LEN			1024
 #define STOCK_HEADER_LEN			7
 #define	STOCK_SHORTBUF_LEN	256
-#define TEST__INTERVAL		3000	// 3sec
-#define TEST_SIG__INTERVAL	5000	// 5sec
+#define TEST__INTERVAL		3000	// 3 sec
+#define TEST_SIG__INTERVAL	30000	// 30 sec
 //------------------------------------------------------------------------------
 // Protocol
 //------------------------------------------------------------------------------
