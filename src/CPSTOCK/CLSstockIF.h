@@ -104,6 +104,8 @@ private:
 	struct timeval m_testTimer;	// test
 	struct timeval m_sigTimer;	// signal 발생 타이머 (test)
 
+	int m_sigTxIdx;		// signal은 buy, sell 합쳐서 10개만 보낸다. index가 10이되면 signal은 더이상 전송되지 않는다.
+
 	TradeSigInfo m_sigInfo;
 
 	void InitComState(bool connected = false);
@@ -117,6 +119,7 @@ private:
 	bool SendAck(BYTE code, BYTE nackCode = 0);
 	bool SendNAck(BYTE code);
 	bool SendSignal(BYTE code);
+	bool SendSignal2(BYTE code);
 	bool SendTest(BYTE code);
 
 	bool SendMessage(void);

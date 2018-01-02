@@ -19,6 +19,7 @@ void ClearEnv(void);
 //------------------------------------------------------------------------------
 CLSlog Log("CPSTOCK", DIR_LOG);
 CLSmap Map("CLMAP"); 
+STOCK_DB stockDB[10];
 //------------------------------------------------------------------------------
 // Local Variable
 //------------------------------------------------------------------------------
@@ -258,6 +259,56 @@ void TerminateThread(void)
 	Log.Write("TerminateThread [6]");
 }
 //------------------------------------------------------------------------------
+// InitStockDatabase
+//------------------------------------------------------------------------------
+bool InitStockDatabase(void)
+{
+	sprintf(stockDB[0].code, "%s" ,"090430");
+	sprintf(stockDB[0].codeName, "%s", "아모레퍼시픽");
+	sprintf(&stockDB[0].type, "%c", 'b');
+
+	sprintf(stockDB[1].code, "%s", "000720");
+	sprintf(stockDB[1].codeName, "%s", "현대건설");
+	sprintf(&stockDB[1].type, "%c", 'b');
+
+	sprintf(stockDB[2].code, "%s", "265520");
+	sprintf(stockDB[2].codeName, "%s", "AP시스템");
+	sprintf(&stockDB[2].type, "%c", 'b');
+
+	sprintf(stockDB[3].code, "%s", "265520");
+	sprintf(stockDB[3].codeName, "%s", "AP시스템");
+	sprintf(&stockDB[3].type, "%c", 's');
+
+	sprintf(stockDB[4].code, "%s", "090430");
+	sprintf(stockDB[4].codeName, "%s", "아모레퍼시픽");
+	sprintf(&stockDB[4].type, "%c", 's');
+
+	sprintf(stockDB[5].code, "%s", "000720");
+	sprintf(stockDB[5].codeName, "%s", "현대건설");
+	sprintf(&stockDB[5].type, "%c", 's');
+
+	sprintf(stockDB[6].code, "%s", "010120");
+	sprintf(stockDB[6].codeName, "%s", "LS산전");
+	sprintf(&stockDB[6].type, "%c", 'b');
+
+	sprintf(stockDB[7].code, "%s", "096770");
+	sprintf(stockDB[7].codeName, "%s", "SK이노베이션");
+	sprintf(&stockDB[7].type, "%c", 'b');
+
+	sprintf(stockDB[8].code, "%s", "010120");
+	sprintf(stockDB[8].codeName, "%s", "LS산전");
+	sprintf(&stockDB[8].type, "%c", 's');
+
+	sprintf(stockDB[9].code, "%s", "096770");
+	sprintf(stockDB[9].codeName, "%s", "SK이노베이션");
+	sprintf(&stockDB[9].type, "%c", 's');
+
+	for (int i = 0; i < 10; i++)
+	{
+		Log.Debug("%s, %s, %c", stockDB[i].code, stockDB[i].codeName, stockDB[i].type);
+	}
+}
+//------------------------------------------------------------------------------
 // InitStockCL
 //------------------------------------------------------------------------------
 bool InitStockCL(void)
@@ -330,6 +381,7 @@ bool InitEnv(int argc, char **argv)
 	InitSignal();	// 시그널 처리기 초기화
 	Log.Write("Init Signal");
 	InitOption(argc, argv);		// 옵션 처리
+	InitStockDatabase();		// Init StockDatabase
 
 	// 공유메모리 초기화
 	if (!InitMemory())

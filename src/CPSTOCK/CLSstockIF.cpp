@@ -14,24 +14,27 @@ extern CLSmap Map;
 extern CLSprocess *ShmPrc;
 extern CLSsystem *ShmSys;
 extern SHARED_MEM *ShmPtr;
+extern STOCK_DB stockDB[10];
+//------------------------------------------------------------------------------
+// Local
 //------------------------------------------------------------------------------
 // CLSvimsIF
 //------------------------------------------------------------------------------
 CLSstockIF::CLSstockIF(void)
 {
-
+	m_sigTxIdx = 0;
 }
 //------------------------------------------------------------------------------
 CLSstockIF::CLSstockIF(const char *name, int port, const char *ipAddr, TCP_MODE mode)
 	: CLStcp(name, port, ipAddr, mode)
 {
-
+	m_sigTxIdx = 0;
 }
 //------------------------------------------------------------------------------
 CLSstockIF::CLSstockIF(const char *name, int port, int id, TCP_MODE mode)
 	: CLStcp(name, port, id, mode)
 {
-
+	m_sigTxIdx = 0;
 }
 //------------------------------------------------------------------------------
 // ~CLSvimsIF
@@ -140,7 +143,8 @@ bool CLSstockIF::ManageTX(void)
 
 	// Test Sendmessage (SendSig)	 interval 5 sec
 	if (CheckElapsedTime(&m_sigTimer, TEST_SIG__INTERVAL))
-		return(SendSignal(BUY_SIG));
+		//return(SendSignal(BUY_SIG));
+		return(SendSignal2(BUY_SIG));
 
 	return (true);
 }
@@ -231,34 +235,50 @@ bool CLSstockIF::SendNAck(BYTE code)
 }
 bool CLSstockIF::SendSignal(BYTE code)
 {
+	/*
 	int idx=0;
 	char info[STOCK_SHORTBUF_LEN];
 
 	memset(info, 0x00, 47);
 
-	info[idx] = 'b';	m_sigInfo.type = info[idx];		 idx += 1;
-	/*info[idx] = 12;		m_sigInfo.mon = info[idx];		 idx += 1;
-	info[idx] = 15;		m_sigInfo.day = info[idx];		 idx += 1;
-	info[idx] = 17;		m_sigInfo.hour = info[idx];		 idx += 1;
-	info[idx] = 16;		m_sigInfo.minute = info[idx];	 idx == 1;*/
-
+	info[idx] = 'b';	m_sigInfo.type = info[idx];		idx += 1;
 	SetNumber(&info[idx], 12151810, 4);					idx += 4;
-	
-
 	SetStockCode(&info[idx], 7);	idx += 7;
-	SetStockName(&info[idx], 32);	idx += 32;
-	
-	//snprintf(&info[idx], 7, "%s", "123456");	
-	//memcpy(m_sigInfo.stockCode, &info[idx], 7);    idx += 7;	// code		
-
-	//snprintf(&info[idx], 32, "%s", "»ï¼ºÀüÀÚ");	
-	//memcpy(m_sigInfo.stockNm, &info[idx], 7);    idx += 32;	// name
-
+	SetStockName(&info[idx], 32);	idx += 32;	
 	SetNumber(&info[idx], 2500, 4);	 m_sigInfo.price = 2500;		idx += 4;
 
 	Log.Debug("%c %d %d %d %d", m_sigInfo.type, m_sigInfo.mon, m_sigInfo.day, m_sigInfo.hour, m_sigInfo.minute);
 	Log.Debug("%s %s %d", m_sigInfo.stockCode, m_sigInfo.stockNm, m_sigInfo.price);
 	
+	return (SendMessage(code, idx, info));
+	*/
+	return (true);
+}
+bool CLSstockIF::SendSignal2(BYTE code)
+{
+	int idx = 0;
+	char info[STOCK_SHORTBUF_LEN];
+
+	if (m_sigTxIdx > 9)
+		return (true);
+
+	memset(info, 0x00, 47);
+
+	stockDB[m_sigTxIdx].code;
+	stockDB[m_sigTxIdx].codeName;
+	stockDB[m_sigTxIdx].type;
+
+
+	info[idx] = stockDB[m_sigTxIdx].type;	m_sigInfo.type = info[idx];		idx += 1;
+	SetNumber(&info[idx], 1021459, 4);										idx += 4;
+	sprintf(&info[idx], "%s", stockDB[m_sigTxIdx].code);					idx += 7;
+	sprintf(&info[idx], "%s", stockDB[m_sigTxIdx].codeName);				idx += 32;
+	SetNumber(&info[idx], 2500, 4);	 m_sigInfo.price = 2500;				idx += 4;
+		
+	Log.Debug("[%c] %s %s %d", m_sigInfo.type, stockDB[m_sigTxIdx].code, stockDB[m_sigTxIdx].codeName, m_sigInfo.price);
+
+	m_sigTxIdx++;
+
 	return (SendMessage(code, idx, info));
 }
 bool CLSstockIF::SendTest(BYTE code)

@@ -130,14 +130,14 @@ void *THRclient(void *data)
 
 
 	Log.Write("THRclient log address %d ", Log);
+		
 	// Main loop
 	while (initOK && !pThread->Terminate && !NeedTerminate())
 	{	
 		pThread->MarkTime();
-		if ((++cycle) % 500 == 0)
-		{
-			Log.Write("##CLTHR[%d] stock [%d]", id, cycle);
-			Log.Debug("##CLTHR[%d] stock [%d]", id, cycle);
+		if ((++cycle) % 1000 == 0)
+		{			
+			Log.Debug("##CLTHR[%d] stock [%d]", id, cycle / 1000);
 			if (cycle == 100000000) cycle = 0;
 		}
 		// Client 통신 관리
