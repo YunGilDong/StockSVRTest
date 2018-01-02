@@ -135,8 +135,8 @@ bool CLSstockIF::ManageTX(void)
 		return (true);
 
 	// Test Sendmessage (SendTest)	 interval 3 sec
-	if (CheckElapsedTime(&m_testTimer, TEST__INTERVAL))
-		return(SendTest(0x99));
+	//if (CheckElapsedTime(&m_testTimer, TEST__INTERVAL))
+	//	return(SendTest(0x99));
 
 	// Test Sendmessage (SendSig)	 interval 5 sec
 	if (CheckElapsedTime(&m_sigTimer, TEST_SIG__INTERVAL))
